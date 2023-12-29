@@ -5,9 +5,9 @@ my `slog` handler
 ### Usage
 
 ```go
-log := jplog.New()
+log := jplog.New(os.Stdout)
 // which is shorthand for:
-log := slog.New(jplog.Handler())
+log := slog.New(jplog.Handler(os.Stdout))
 ```
 
 ### Output
@@ -18,7 +18,7 @@ package main
 import "github.com/jpillora/jplog"
 
 func main() {
-	log := jplog.New().WithGroup("myapp")
+	log := jplog.New(os.Stdout).WithGroup("myapp")
 	log.Info("a msg", "hello", "world", "foo", "bar")
 	log.Warn("a msg", "hello", "world")
 	log.Error("a msg", "hello", 42)

@@ -3,25 +3,35 @@ package jplog
 import (
 	"context"
 	"fmt"
+	"io"
 	"log/slog"
+	"os"
 	"strings"
 )
 
-func New() *slog.Logger {
-	return slog.New(Handler())
+func New(w io.Writer) *slog.Logger {
+	// if you want to customise json handler, use slog.NewJSONHandler
+	if s := os.Getenv("LOG_JSON"); s == "1" || s == "true" {
+		return slog.New(slog.NewJSONHandler(w, nil))
+	}
+	return slog.New(Handler(w))
 }
 
+// JPHandler is jpillora's slog.Handler
 type JPHandler interface {
 	slog.Handler
 	// enabled verbose logging
 	Verbose() JPHandler
 }
 
-func Handler() JPHandler {
-	return &h{}
+func Handler(w io.Writer) JPHandler {
+	return &h{
+		w: w,
+	}
 }
 
 type h struct {
+	w       io.Writer
 	group   string
 	verbose bool
 	attrs   []slog.Attr
@@ -84,6 +94,6 @@ func (h *h) Handle(ctx context.Context, r slog.Record) error {
 	for _, attr := range h.attrs {
 		add(attr)
 	}
-	fmt.Println(sb.String())
+	fmt.Fprintln(h.w, sb.String())
 	return nil
 }
