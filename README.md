@@ -2,6 +2,8 @@
 
 my `slog` handler
 
+:warning: this API may change
+
 ### Usage
 
 ```go
